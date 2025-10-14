@@ -1,6 +1,10 @@
 const express = require('express');
 const fetch = require('node-fetch');
 const app = express();
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
 const PORT = process.env.PORT || 3000;
 
 // Ваши данные из Spotify Developer
@@ -86,3 +90,4 @@ app.listen(PORT, async () => {
     setInterval(refreshAccessToken, 50 * 60 * 1000);
 
 });
+
