@@ -53,7 +53,7 @@ async function getCurrentTrack() {
             if (data && data.item) {
                 const artist = data.item.artists[0].name;
                 const track = data.item.name;
-                return `Сейчас играет: ${artist} - ${track}`;
+                return `${artist} - ${track}`;
             } else {
                 return 'Сейчас ничего не играет';
             }
@@ -84,4 +84,5 @@ app.listen(PORT, async () => {
     await refreshAccessToken();
     // Автообновление токена каждые 50 минут
     setInterval(refreshAccessToken, 50 * 60 * 1000);
+
 });
