@@ -3,8 +3,11 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Данные приложения Spotify
 const CLIENT_ID = '29eeefe2169144d8b7feee773072b1bd';
 const CLIENT_SECRET = '8d27b07f376e4353a64e37a970147bf6';
+
+// СЮДА ВСТАВЬ СВОЙ REFRESH_TOKEN (который получил через CMD)
 const REFRESH_TOKEN = 'AQARNlJ72jS1xEvvfTXfbp_12Zq47upafmT7C1cfYo8-V2GnLicDUBWqJ-9so2qf60Dl9enCtJdVwKGGfbhl6JifAH7wv7g2eLvaPwSLeHb-XhWBnvuzg9_cIBnWXItQ8bg';
 
 let currentAccessToken = '';
@@ -17,8 +20,10 @@ async function refreshAccessToken() {
             });
         currentAccessToken = response.data.access_token;
         console.log('✅ Токен обновлен:', new Date().toLocaleTimeString());
+        return true;
     } catch (error) {
         console.error('❌ Ошибка обновления:', error.response?.data || error.message);
+        return false;
     }
 }
 
@@ -33,37 +38,20 @@ async function getCurrentTrack() {
             headers: { 'Authorization': `Bearer ${currentAccessToken}` }
         });
         
-        // Логируем статус для диагностики
-        console.log('Spotify API статус:', response.status);
-        
-        if (response.status === 200 && response.data && response.data.item) {
+        if (response.data && response.data.item) {
             const artist = response.data.item.artists.map(a => a.name).join(', ');
             const track = response.data.item.name;
             return `🎵 ${track} — ${artist}`;
-        } else if (response.status === 204) {
-            return '⏸️ Spotify не играет (плеер закрыт или на паузе)';
-        } else {
-            return '❌ Неизвестный ответ от Spotify';
         }
+        return '⏸️ Spotify не играет';
     } catch (error) {
-        // Подробное логирование ошибки
-        console.error('Детали ошибки:', {
-            status: error.response?.status,
-            data: error.response?.data,
-            message: error.message
-        });
-        
         if (error.response?.status === 401) {
             await refreshAccessToken();
             return '🔄 Токен обновлен, попробуйте еще раз';
         }
-        if (error.response?.status === 403) {
-            return '🚫 Доступ запрещен. Проверьте разрешения в Spotify';
-        }
-        if (error.response?.status === 404) {
-            return '❌ Не удалось найти активный плеер. Откройте Spotify на компьютере';
-        }
-        return `❌ Ошибка: ${error.response?.status || 'неизвестная'}`;
+        if (error.response?.status === 204) return '⏸️ Spotify не играет';
+        if (error.response?.status === 403) return '🚫 Доступ запрещен. Проверьте разрешения Spotify';
+        return '❌ Ошибка API';
     }
 }
 
