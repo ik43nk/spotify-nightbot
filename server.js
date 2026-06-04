@@ -3,11 +3,9 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Данные приложения Spotify
+// НОВЫЕ данные от приложения (те, которые только что использовал в cmd)
 const CLIENT_ID = 'b81bb4c392de4b739baae67d3eee3b46';
 const CLIENT_SECRET = '0ab0975fa3cc4527a9b8e3367a484a2f';
-
-// СЮДА ВСТАВЬ СВОЙ REFRESH_TOKEN (который получил через CMD)
 const REFRESH_TOKEN = 'AQBPKuSGVORO6YMH8wecIRK9wNpdpkV3IjEu9TBP2qRhLgCbmFfy1aWZtyUv-4hzmNDJ_vWNI5rv_Ydu1if15TRMZ9QVB2CyMcrQkTBUKvIaDPLACgxvsc5n_phw2ILjxwk';
 
 let currentAccessToken = '';
