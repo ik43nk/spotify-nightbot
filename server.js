@@ -4,11 +4,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Данные приложения Spotify
-const CLIENT_ID = '29eeefe2169144d8b7feee773072b1bd';
-const CLIENT_SECRET = '8d27b07f376e4353a64e37a970147bf6';
+const CLIENT_ID = 'b81bb4c392de4b739baae67d3eee3b46';
+const CLIENT_SECRET = '0ab0975fa3cc4527a9b8e3367a484a2f';
 
 // СЮДА ВСТАВЬ СВОЙ REFRESH_TOKEN (который получил через CMD)
-const REFRESH_TOKEN = 'AQARNlJ72jS1xEvvfTXfbp_12Zq47upafmT7C1cfYo8-V2GnLicDUBWqJ-9so2qf60Dl9enCtJdVwKGGfbhl6JifAH7wv7g2eLvaPwSLeHb-XhWBnvuzg9_cIBnWXItQ8bg';
+const REFRESH_TOKEN = 'AQBPKuSGVORO6YMH8wecIRK9wNpdpkV3IjEu9TBP2qRhLgCbmFfy1aWZtyUv-4hzmNDJ_vWNI5rv_Ydu1if15TRMZ9QVB2CyMcrQkTBUKvIaDPLACgxvsc5n_phw2ILjxwk';
 
 let currentAccessToken = '';
 
