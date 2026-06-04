@@ -1,70 +1,35 @@
 const express = require('express');
-const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// НОВЫЕ данные от приложения (те, которые только что использовал в cmd)
-const CLIENT_ID = 'b81bb4c392de4b739baae67d3eee3b46';
-const CLIENT_SECRET = '0ab0975fa3cc4527a9b8e3367a484a2f';
-const REFRESH_TOKEN = 'AQBPKuSGVORO6YMH8wecIRK9wNpdpkV3IjEu9TBP2qRhLgCbmFfy1aWZtyUv-4hzmNDJ_vWNI5rv_Ydu1if15TRMZ9QVB2CyMcrQkTBUKvIaDPLACgxvsc5n_phw2ILjxwk';
+// Переменная для хранения текущего трека
+let currentTrack = "⏸️ Spotify не играет";
 
-let currentAccessToken = '';
+app.use(express.json()); // Чтобы читать JSON из POST запросов
 
-async function refreshAccessToken() {
-    try {
-        const response = await axios.post('https://accounts.spotify.com/api/token', 
-            `grant_type=refresh_token&refresh_token=${REFRESH_TOKEN}&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`, {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            });
-        currentAccessToken = response.data.access_token;
-        console.log('✅ Токен обновлен:', new Date().toLocaleTimeString());
-        return true;
-    } catch (error) {
-        console.error('❌ Ошибка обновления:', error.response?.data || error.message);
-        return false;
+// Эндпоинт для обновления трека (твой компьютер будет стучаться сюда)
+app.post('/update-track', (req, res) => {
+    const { track } = req.body;
+    if (track) {
+        currentTrack = track;
+        console.log('🎵 Трек обновлён:', track);
+        res.json({ status: 'ok' });
+    } else {
+        res.json({ status: 'error', message: 'no track' });
     }
-}
+});
 
-async function getCurrentTrack() {
-    if (!currentAccessToken) {
-        const success = await refreshAccessToken();
-        if (!success) return '❌ Ошибка авторизации Spotify';
-    }
-    
-    try {
-        const response = await axios.get('https://api.spotify.com/v1/me/player/currently-playing', {
-            headers: { 'Authorization': `Bearer ${currentAccessToken}` }
-        });
-        
-        if (response.data && response.data.item) {
-            const artist = response.data.item.artists.map(a => a.name).join(', ');
-            const track = response.data.item.name;
-            return `🎵 ${track} — ${artist}`;
-        }
-        return '⏸️ Spotify не играет';
-    } catch (error) {
-        if (error.response?.status === 401) {
-            await refreshAccessToken();
-            return '🔄 Токен обновлен, попробуйте еще раз';
-        }
-        if (error.response?.status === 204) return '⏸️ Spotify не играет';
-        if (error.response?.status === 403) return '🚫 Доступ запрещен. Проверьте разрешения Spotify';
-        return '❌ Ошибка API';
-    }
-}
-
-app.get('/current-track', async (req, res) => {
-    const trackInfo = await getCurrentTrack();
+// Эндпоинт для Nightbot
+app.get('/current-track', (req, res) => {
     res.set('Content-Type', 'text/plain; charset=utf-8');
-    res.send(trackInfo);
+    res.send(currentTrack);
 });
 
+// Простой тест
 app.get('/', (req, res) => {
-    res.send('✅ Сервер работает! Используйте /current-track');
+    res.send('✅ Сервер работает');
 });
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
     console.log(`✅ Сервер запущен на порту ${PORT}`);
-    await refreshAccessToken();
-    setInterval(refreshAccessToken, 50 * 60 * 1000);
 });
